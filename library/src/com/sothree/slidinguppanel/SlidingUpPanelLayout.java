@@ -44,6 +44,11 @@ public class SlidingUpPanelLayout extends ViewGroup {
     private static final int DEFAULT_FADE_COLOR = 0x99000000;
 
     /**
+     * If panel is transparent, use default panel color
+     */
+    private static final int DEFAULT_PANEL_COLOR_TRANSPARENT = 0x99FFFFFF;
+
+    /**
      * Default Minimum velocity that will be detected as a fling
      */
     private static final int DEFAULT_MIN_FLING_VELOCITY = 400; // dips per second
@@ -156,6 +161,12 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * Threshold to tell if there was a scroll touch event.
      */
     private final int mScrollTouchSlop;
+
+    /*
+     * Transparency flag
+     */
+    private boolean mIsTransparent = false;
+    private int mTransparentColor = DEFAULT_PANEL_COLOR_TRANSPARENT;
 
     private float mInitialMotionX;
     private float mInitialMotionY;
@@ -349,11 +360,27 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
 
     /**
+     * Set a transparent color
+     *
+     * @param transparentColor transparent color
+     */
+    public void setTransparentColor(int transparentColor) {
+        mTransparentColor = transparentColor;
+    }
+
+    /**
      * Set the shadow for the sliding panel
      *
      */
     public void setShadowDrawable(Drawable drawable) {
         mShadowDrawable = drawable;
+    }
+
+    /**
+     * Set transparent flag
+     */
+    public void setIsTransparent(boolean isTransparent) {
+        mIsTransparent = isTransparent;
     }
 
     void dispatchOnPanelSlide(View panel) {
@@ -495,22 +522,26 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 height -= panelHeight;
             }
 
-            int childWidthSpec;
-            if (lp.width == LayoutParams.WRAP_CONTENT) {
-                childWidthSpec = MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.AT_MOST);
-            } else if (lp.width == LayoutParams.MATCH_PARENT) {
+            int childWidthSpec, childHeightSpec;
+            if (mIsTransparent && i == 0) {
                 childWidthSpec = MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY);
+                childHeightSpec = MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.EXACTLY);
             } else {
-                childWidthSpec = MeasureSpec.makeMeasureSpec(lp.width, MeasureSpec.EXACTLY);
-            }
+                if (lp.width == LayoutParams.WRAP_CONTENT) {
+                    childWidthSpec = MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.AT_MOST);
+                } else if (lp.width == LayoutParams.MATCH_PARENT) {
+                    childWidthSpec = MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY);
+                } else {
+                    childWidthSpec = MeasureSpec.makeMeasureSpec(lp.width, MeasureSpec.EXACTLY);
+                }
 
-            int childHeightSpec;
-            if (lp.height == LayoutParams.WRAP_CONTENT) {
-                childHeightSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.AT_MOST);
-            } else if (lp.height == LayoutParams.MATCH_PARENT) {
-                childHeightSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
-            } else {
-                childHeightSpec = MeasureSpec.makeMeasureSpec(lp.height, MeasureSpec.EXACTLY);
+                if (lp.height == LayoutParams.WRAP_CONTENT) {
+                    childHeightSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.AT_MOST);
+                } else if (lp.height == LayoutParams.MATCH_PARENT) {
+                    childHeightSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
+                } else {
+                    childHeightSpec = MeasureSpec.makeMeasureSpec(lp.height, MeasureSpec.EXACTLY);
+                }
             }
 
             child.measure(childWidthSpec, childHeightSpec);
@@ -543,6 +574,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
         for (int i = 0; i < childCount; i++) {
             final View child = getChildAt(i);
+
+            if (mIsTransparent && i == 1)
+                child.setBackgroundColor(mTransparentColor);
 
             if (child.getVisibility() == GONE) {
                 continue;
@@ -851,7 +885,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
             } else {
                 mTmpRect.top = Math.max(mTmpRect.top, mSlideableView.getBottom());
             }
-            canvas.clipRect(mTmpRect);
+
+            if (!mIsTransparent)
+                canvas.clipRect(mTmpRect);
+
             if (mSlideOffset < 1) {
                 drawScrim = true;
             }
