@@ -44,11 +44,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
     private static final int DEFAULT_FADE_COLOR = 0x99000000;
 
     /**
-     * If panel is transparent, use default panel color
-     */
-    private static final int DEFAULT_PANEL_COLOR_TRANSPARENT = 0x99FFFFFF;
-
-    /**
      * Default Minimum velocity that will be detected as a fling
      */
     private static final int DEFAULT_MIN_FLING_VELOCITY = 400; // dips per second
@@ -166,7 +161,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * Transparency flag
      */
     private boolean mIsTransparent = false;
-    private int mTransparentColor = DEFAULT_PANEL_COLOR_TRANSPARENT;
 
     private float mInitialMotionX;
     private float mInitialMotionY;
@@ -359,15 +353,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
     public void setAnchorPoint(float anchorPoint) {
         if (anchorPoint > 0 && anchorPoint < 1)
             mAnchorPoint = anchorPoint;
-    }
-
-    /**
-     * Set a transparent color
-     *
-     * @param transparentColor transparent color
-     */
-    public void setTransparentColor(int transparentColor) {
-        mTransparentColor = transparentColor;
     }
 
     /**
@@ -578,7 +563,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             final View child = getChildAt(i);
 
             if (mIsTransparent && i == 1)
-                child.setBackgroundColor(mTransparentColor);
+                child.setBackgroundColor(getResources().getColor(android.R.color.transparent));
 
             if (child.getVisibility() == GONE) {
                 continue;
