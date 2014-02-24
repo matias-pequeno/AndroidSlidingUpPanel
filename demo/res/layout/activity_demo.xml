@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="bottom"
+        sothree:transparent="true"
         sothree:collapsedHeight="68dp"
         sothree:shadowHeight="4dp"
         sothree:dragView="@+id/name">
@@ -18,17 +19,19 @@
             android:id="@+id/main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#ffb5d8ff"
             android:gravity="center"
             android:text="Main Content"
             android:clickable="true"
             android:focusable="false"
             android:focusableInTouchMode="true"
-            android:textSize="16sp" />
+            android:textColor="#ff5f4f2a"
+            android:textStyle="bold"
+            android:textSize="24sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#eee"
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="false">
@@ -36,6 +39,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="68dp"
+                android:background="@drawable/selector_collapsed_background"
                 android:orientation="horizontal">
 
                 <TextView
@@ -62,6 +66,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:background="@android:color/white"
                 android:scaleType="fitStart"
                 android:src="@drawable/graphic" >
             </ImageView>
