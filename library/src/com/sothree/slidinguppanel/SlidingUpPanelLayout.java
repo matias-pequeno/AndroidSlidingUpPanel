@@ -260,6 +260,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 mPanelHeight = ta.getDimensionPixelSize(R.styleable.SlidingUpPanelLayout_collapsedHeight, -1);
                 mShadowHeight = ta.getDimensionPixelSize(R.styleable.SlidingUpPanelLayout_shadowHeight, -1);
 
+                mIsTransparent = ta.getBoolean(R.styleable.SlidingUpPanelLayout_transparent, false);
+
                 mMinFlingVelocity = ta.getInt(R.styleable.SlidingUpPanelLayout_flingVelocity, DEFAULT_MIN_FLING_VELOCITY);
                 mCoveredFadeColor = ta.getColor(R.styleable.SlidingUpPanelLayout_fadeColor, DEFAULT_FADE_COLOR);
 
