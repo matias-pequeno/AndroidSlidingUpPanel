@@ -848,6 +848,14 @@ public class SlidingUpPanelLayout extends ViewGroup {
         requestLayout();
     }
 
+    public View getPanelView() {
+        return getChildAt(1);
+    }
+
+    public Drawable getShadowDrawable() {
+        return mShadowDrawable;
+    }
+
     private void onPanelDragged(int newTop) {
         final int topBound = getSlidingTop();
         mSlideOffset = mIsSlidingUp
