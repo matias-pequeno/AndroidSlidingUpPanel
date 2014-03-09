@@ -355,6 +355,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
             mAnchorPoint = anchorPoint;
     }
 
+    public float getAnchoredRange() {
+        return mPanelHeight + (1.f - mAnchorPoint) * mSlideRange;
+    }
+
     /**
      * Set the shadow for the sliding panel
      *
