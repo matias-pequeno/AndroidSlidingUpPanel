@@ -115,7 +115,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     /**
      * Current state of the slideable view.
      */
-    private enum SlideState {
+    public enum SlideState {
         EXPANDED,
         COLLAPSED,
         ANCHORED
@@ -357,6 +357,19 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     public float getAnchoredRange() {
         return mPanelHeight + (1.f - mAnchorPoint) * mSlideRange;
+    }
+
+    public SlideState getSlideState() {
+        return mSlideState;
+    }
+
+    public void setSlideState(final SlideState slideState) {
+        mSlideState = slideState;
+        switch (mSlideState) {
+            case COLLAPSED: mSlideOffset = 0; break;
+            case EXPANDED: mSlideOffset = 1; break;
+            case ANCHORED: mSlideOffset = 1.f - mAnchorPoint; break;
+        }
     }
 
     /**
