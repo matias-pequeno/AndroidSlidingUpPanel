@@ -1204,6 +1204,18 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 top += mSlideRange;
             }
 
+            // Dispatch the event depending on the type of slide that is about to be performed
+            if (top == mSlideRange) {
+                dispatchOnPanelWillCollapse(mSlideableView);
+            } else if (top > mSlideRange) {
+                dispatchOnPanelWillHide(mSlideableView);
+            } else if (top == 0.f) {
+                dispatchOnPanelWillExpand(mSlideableView);
+            } else if (top == (int)(mAnchorPoint * mSlideRange)) {
+                dispatchOnPanelWillAnchor(mSlideableView);
+            }
+
+            Log.d(TAG, "settleCapturedViewAt " + top);
             mDragHelper.settleCapturedViewAt(releasedChild.getLeft(), top);
             invalidate();
         }
