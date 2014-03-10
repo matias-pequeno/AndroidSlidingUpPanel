@@ -365,19 +365,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         return mPanelHeight + (1.f - mAnchorPoint) * mSlideRange;
     }
 
-    public SlideState getSlideState() {
-        return mSlideState;
-    }
-
-    public void setSlideState(final SlideState slideState) {
-        mSlideState = slideState;
-        switch (mSlideState) {
-            case COLLAPSED: mSlideOffset = 0; break;
-            case EXPANDED: mSlideOffset = 1; break;
-            case ANCHORED: mSlideOffset = 1.f - mAnchorPoint; break;
-        }
-    }
-
     /**
      * Set the shadow for the sliding panel
      *
