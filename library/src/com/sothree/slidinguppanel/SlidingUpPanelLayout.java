@@ -989,6 +989,17 @@ public class SlidingUpPanelLayout extends ViewGroup {
             return false;
         }
 
+        // Dispatch the event depending on the type of slide that is about to be performed
+        if (slideOffset == 1.f) {
+            dispatchOnPanelWillCollapse(mSlideableView);
+        } else if (slideOffset > 1.f) {
+            dispatchOnPanelWillHide(mSlideableView);
+        } else if (slideOffset == 0.f) {
+            dispatchOnPanelWillExpand(mSlideableView);
+        } else if (mSlideOffset == mAnchorPoint) {
+            dispatchOnPanelWillAnchor(mSlideableView);
+        }
+
         final int topBound = getSlidingTop();
         int y = mIsSlidingUp
                 ? (int) (topBound + slideOffset * mSlideRange)
@@ -1185,7 +1196,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 if (yvel > 0 || (yvel == 0 && mSlideOffset >= (1f+anchorOffset)/2)) {
                     top += mSlideRange;
                 } else if (yvel == 0 && mSlideOffset < (1f+anchorOffset)/2
-                                    && mSlideOffset >= anchorOffset/2) {
+                                     && mSlideOffset >= anchorOffset/2) {
                     top += mSlideRange * mAnchorPoint;
                 }
 
