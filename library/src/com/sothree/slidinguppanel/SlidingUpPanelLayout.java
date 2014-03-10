@@ -190,6 +190,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
          * @param slideOffset The new offset of this sliding pane within its range, from 0-1
          */
         public void onPanelSlide(View panel, float slideOffset);
+
         /**
          * Called when a sliding pane becomes slid completely collapsed. The pane may or may not
          * be interactive at this point depending on if it's shown or hidden
@@ -207,6 +208,15 @@ public class SlidingUpPanelLayout extends ViewGroup {
         public void onPanelAnchored(View panel);
 
         public void onPanelHidden(View panel);
+
+        /**
+         * Called previous to the animation start. Useful if you want to perform an animation at the
+         * same time, such as animating Google Map's padding together with the pane.
+         */
+        public void onPanelWillCollapse(View panel);
+        public void onPanelWillExpand(View panel);
+        public void onPanelWillAnchor(View panel);
+        public void onPanelWillHide(View panel);
     }
 
     /**
@@ -228,6 +238,18 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
         @Override
         public void onPanelHidden(View panel) {
+        }
+        @Override
+        public void onPanelWillCollapse(View panel) {
+        }
+        @Override
+        public void onPanelWillExpand(View panel) {
+        }
+        @Override
+        public void onPanelWillAnchor(View panel) {
+        }
+        @Override
+        public void onPanelWillHide(View panel) {
         }
     }
 
@@ -410,6 +432,34 @@ public class SlidingUpPanelLayout extends ViewGroup {
     void dispatchOnPanelHidden(View panel) {
         if (mPanelSlideListener != null) {
             mPanelSlideListener.onPanelHidden(panel);
+        }
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
+    void dispatchOnPanelWillExpand(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelWillExpand(panel);
+        }
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
+    void dispatchOnPanelWillCollapse(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelWillCollapse(panel);
+        }
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
+    void dispatchOnPanelWillAnchor(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelWillAnchor(panel);
+        }
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
+    void dispatchOnPanelWillHide(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelWillHide(panel);
         }
         sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
     }
