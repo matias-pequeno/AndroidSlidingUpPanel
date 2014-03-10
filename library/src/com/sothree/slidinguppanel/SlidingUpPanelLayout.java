@@ -190,6 +190,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
          * @param slideOffset The new offset of this sliding pane within its range, from 0-1
          */
         public void onPanelSlide(View panel, float slideOffset);
+
         /**
          * Called when a sliding pane becomes slid completely collapsed. The pane may or may not
          * be interactive at this point depending on if it's shown or hidden
@@ -207,6 +208,15 @@ public class SlidingUpPanelLayout extends ViewGroup {
         public void onPanelAnchored(View panel);
 
         public void onPanelHidden(View panel);
+
+        /**
+         * Called previous to the animation start. Useful if you want to perform an animation at the
+         * same time, such as animating Google Map's padding together with the pane.
+         */
+        public void onPanelWillCollapse(View panel);
+        public void onPanelWillExpand(View panel);
+        public void onPanelWillAnchor(View panel);
+        public void onPanelWillHide(View panel);
     }
 
     /**
@@ -228,6 +238,18 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
         @Override
         public void onPanelHidden(View panel) {
+        }
+        @Override
+        public void onPanelWillCollapse(View panel) {
+        }
+        @Override
+        public void onPanelWillExpand(View panel) {
+        }
+        @Override
+        public void onPanelWillAnchor(View panel) {
+        }
+        @Override
+        public void onPanelWillHide(View panel) {
         }
     }
 
@@ -410,6 +432,34 @@ public class SlidingUpPanelLayout extends ViewGroup {
     void dispatchOnPanelHidden(View panel) {
         if (mPanelSlideListener != null) {
             mPanelSlideListener.onPanelHidden(panel);
+        }
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
+    void dispatchOnPanelWillExpand(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelWillExpand(panel);
+        }
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
+    void dispatchOnPanelWillCollapse(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelWillCollapse(panel);
+        }
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
+    void dispatchOnPanelWillAnchor(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelWillAnchor(panel);
+        }
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
+    void dispatchOnPanelWillHide(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelWillHide(panel);
         }
         sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
     }
@@ -761,17 +811,11 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
 
     private boolean expandPane(View pane, int initialVelocity, float mSlideOffset) {
-        if (mFirstLayout || smoothSlideTo(mSlideOffset, initialVelocity)) {
-            return true;
-        }
-        return false;
+        return mFirstLayout || smoothSlideTo(mSlideOffset, initialVelocity);
     }
 
     private boolean collapsePane(View pane, int initialVelocity) {
-        if (mFirstLayout || smoothSlideTo(1.f, initialVelocity)) {
-            return true;
-        }
-        return false;
+        return mFirstLayout || smoothSlideTo(1.f, initialVelocity);
     }
 
     private int getSlidingTop() {
@@ -943,6 +987,17 @@ public class SlidingUpPanelLayout extends ViewGroup {
         if (!mCanSlide) {
             // Nothing to do.
             return false;
+        }
+
+        // Dispatch the event depending on the type of slide that is about to be performed
+        if (slideOffset == 1.f) {
+            dispatchOnPanelWillCollapse(mSlideableView);
+        } else if (slideOffset > 1.f) {
+            dispatchOnPanelWillHide(mSlideableView);
+        } else if (slideOffset == 0.f) {
+            dispatchOnPanelWillExpand(mSlideableView);
+        } else if (mSlideOffset == mAnchorPoint) {
+            dispatchOnPanelWillAnchor(mSlideableView);
         }
 
         final int topBound = getSlidingTop();
@@ -1141,7 +1196,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 if (yvel > 0 || (yvel == 0 && mSlideOffset >= (1f+anchorOffset)/2)) {
                     top += mSlideRange;
                 } else if (yvel == 0 && mSlideOffset < (1f+anchorOffset)/2
-                                    && mSlideOffset >= anchorOffset/2) {
+                                     && mSlideOffset >= anchorOffset/2) {
                     top += mSlideRange * mAnchorPoint;
                 }
 
@@ -1149,6 +1204,18 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 top += mSlideRange;
             }
 
+            // Dispatch the event depending on the type of slide that is about to be performed
+            if (top == mSlideRange) {
+                dispatchOnPanelWillCollapse(mSlideableView);
+            } else if (top > mSlideRange) {
+                dispatchOnPanelWillHide(mSlideableView);
+            } else if (top == 0.f) {
+                dispatchOnPanelWillExpand(mSlideableView);
+            } else if (top == (int)(mAnchorPoint * mSlideRange)) {
+                dispatchOnPanelWillAnchor(mSlideableView);
+            }
+
+            Log.d(TAG, "settleCapturedViewAt " + top);
             mDragHelper.settleCapturedViewAt(releasedChild.getLeft(), top);
             invalidate();
         }
