@@ -118,7 +118,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
     public enum SlideState {
         EXPANDED,
         COLLAPSED,
-        ANCHORED
+        ANCHORED,
+        HIDDEN
     }
     private SlideState mSlideState = SlideState.COLLAPSED;
 
@@ -204,6 +205,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
         public void onPanelExpanded(View panel);
 
         public void onPanelAnchored(View panel);
+
+        public void onPanelHidden(View panel);
     }
 
     /**
@@ -222,6 +225,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
         @Override
         public void onPanelAnchored(View panel) {
+        }
+        @Override
+        public void onPanelHidden(View panel) {
         }
     }
 
@@ -414,6 +420,13 @@ public class SlidingUpPanelLayout extends ViewGroup {
         sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
     }
 
+    void dispatchOnPanelHidden(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelHidden(panel);
+        }
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
     void updateObscuredViewVisibility() {
         if (getChildCount() == 0) {
             return;
@@ -569,6 +582,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 break;
             case ANCHORED:
                 mSlideOffset = mCanSlide ? mAnchorPoint : 1.f;
+                break;
+            case HIDDEN:
+                mSlideOffset = mCanSlide ? (float)(mSlideRange + mPanelHeight) / (float)mSlideRange : 1.f;
                 break;
             default:
                 mSlideOffset = 1.f;
@@ -807,9 +823,27 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     public boolean expandPane(float mSlideOffset) {
         if (!isPaneVisible()) {
-            showPane();
+            setPaneVisibility(View.VISIBLE);
         }
         return expandPane(mSlideableView, 0, mSlideOffset);
+    }
+
+    /**
+     * Hide the sliding pane if it is currently slideable. If first layout
+     * has already completed this will animate
+     *
+     * @return true if the pane was slideable and is now hidden/in the process of hiding
+     */
+    public boolean hidePane() {
+        float offset = (float)(mSlideRange + mPanelHeight) / (float)mSlideRange;
+        if (mFirstLayout) {
+            mSlideOffset = offset;
+            mSlideState = SlideState.HIDDEN;
+        } else {
+            smoothSlideTo(offset, 0);
+        }
+
+        return true;
     }
 
     /**
@@ -848,20 +882,12 @@ public class SlidingUpPanelLayout extends ViewGroup {
         return slidingPane.getVisibility() == View.VISIBLE;
     }
 
-    public void showPane() {
+    public void setPaneVisibility(final int visibility) {
         if (getChildCount() < 2) {
             return;
         }
         View slidingPane = getChildAt(1);
-        slidingPane.setVisibility(View.VISIBLE);
-        requestLayout();
-    }
-
-    public void hidePane() {
-        if (mSlideableView == null) {
-            return;
-        }
-        mSlideableView.setVisibility(View.GONE);
+        slidingPane.setVisibility(visibility);
         requestLayout();
     }
 
@@ -1082,6 +1108,12 @@ public class SlidingUpPanelLayout extends ViewGroup {
                         updateObscuredViewVisibility();
                         dispatchOnPanelAnchored(mSlideableView);
                         mSlideState = SlideState.ANCHORED;
+                    }
+                } else if (mSlideOffset >= (float)(mSlideRange + mPanelHeight) / (float)mSlideRange) {
+                    if (mSlideState != SlideState.HIDDEN) {
+                        updateObscuredViewVisibility();
+                        dispatchOnPanelHidden(mSlideableView);
+                        mSlideState = SlideState.HIDDEN;
                     }
                 } else if (mSlideState != SlideState.COLLAPSED) {
                     dispatchOnPanelCollapsed(mSlideableView);
