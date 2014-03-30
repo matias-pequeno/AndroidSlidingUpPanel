@@ -996,7 +996,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             dispatchOnPanelWillHide(mSlideableView);
         } else if (slideOffset == 0.f) {
             dispatchOnPanelWillExpand(mSlideableView);
-        } else if (mSlideOffset == mAnchorPoint) {
+        } else if (slideOffset == mAnchorPoint) {
             dispatchOnPanelWillAnchor(mSlideableView);
         }
 
