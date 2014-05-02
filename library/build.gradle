@@ -1,14 +1,21 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.9.+'
+    }
+}
+
 apply plugin: 'android-library'
 
-buildscript {
-  dependencies {
-    classpath 'com.android.tools.build:gradle:0.9.+'
-  }
+repositories {
+    mavenCentral()
 }
 
 dependencies {
-  compile 'com.android.support:support-v4:+'
-	compile 'com.nineoldandroids:library:+'
+    compile 'com.android.support:support-v4:+'
+    compile 'com.nineoldandroids:library:2.4.0'
 }
 
 android {
