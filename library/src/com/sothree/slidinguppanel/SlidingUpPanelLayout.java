@@ -288,6 +288,14 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     public SlidingUpPanelLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        
+        if(isInEditMode()) {
+            mShadowDrawable = null;
+            mScrollTouchSlop = 0;
+            mDragHelper = null;
+            return;
+        }
+        
         if (attrs != null) {
             TypedArray defAttrs = context.obtainStyledAttributes(attrs, DEFAULT_ATTRS);
 
@@ -579,10 +587,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     private static boolean hasOpaqueBackground(View v) {
         final Drawable bg = v.getBackground();
-        if (bg != null) {
-            return bg.getOpacity() == PixelFormat.OPAQUE;
-        }
-        return false;
+        return bg != null && bg.getOpacity() == PixelFormat.OPAQUE;
     }
 
     @Override
